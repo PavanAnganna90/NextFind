@@ -1,34 +1,36 @@
-import { getServerSession } from 'next-auth/next'
-import { authOptions } from '@/lib/auth'
-import { prisma } from '@/lib/prisma'
-import { NextRequest, NextResponse } from 'next/server'
-import { z } from 'zod'
+import { authOptions } from "@/lib/auth";
+import { prisma } from "@/lib/prisma";
+import { getServerSession } from "next-auth/next";
+import { NextRequest, NextResponse } from "next/server";
+import { z } from "zod";
 
 const addToCartSchema = z.object({
-  productId: z.string().min(1, 'Product ID is required'),
+  productId: z.string().min(1, "Product ID is required"),
   variantId: z.string().optional(),
-  quantity: z.number().int().min(1, 'Quantity must be at least 1').default(1),
-})
+  quantity: z.number().int().min(1, "Quantity must be at least 1").default(1),
+});
 
 export async function GET(request: NextRequest) {
   try {
-    // Get NextAuth.js session
-    const session = await getServerSession(authOptions)
-    
+    // Get NextAuth.js session with request context
+    const session = await getServerSession(authOptions, {
+      req: request,
+    });
+
     if (!session?.user?.id) {
       return NextResponse.json(
-        { 
+        {
           success: false,
           error: {
-            code: 'UNAUTHORIZED',
-            message: 'Authentication required',
+            code: "UNAUTHORIZED",
+            message: "Authentication required",
           },
         },
         { status: 401 }
-      )
+      );
     }
 
-    const user = session.user
+    const user = session.user;
 
     const cartItems = await prisma.cartItem.findMany({
       where: { userId: user.id },
@@ -41,30 +43,32 @@ export async function GET(request: NextRequest) {
         },
         variant: true,
       },
-      orderBy: { createdAt: 'desc' },
-    })
+      orderBy: { createdAt: "desc" },
+    });
 
     // Calculate totals
     const subtotal = cartItems.reduce((sum, item) => {
-      const price = Number(item.variant?.price || item.product.price)
-      return sum + (price * item.quantity)
-    }, 0)
+      const price = Number(item.variant?.price || item.product.price);
+      return sum + price * item.quantity;
+    }, 0);
 
-    const tax = subtotal * 0.08 // 8% tax rate
-    const total = subtotal + tax
+    const tax = subtotal * 0.08; // 8% tax rate
+    const total = subtotal + tax;
 
     // Convert Prisma Decimal types to numbers for all prices
-    const serializedItems = cartItems.map(item => ({
+    const serializedItems = cartItems.map((item) => ({
       ...item,
       product: {
         ...item.product,
         price: Number(item.product.price),
       },
-      variant: item.variant ? {
-        ...item.variant,
-        price: item.variant.price ? Number(item.variant.price) : null,
-      } : null,
-    }))
+      variant: item.variant
+        ? {
+            ...item.variant,
+            price: item.variant.price ? Number(item.variant.price) : null,
+          }
+        : null,
+    }));
 
     return NextResponse.json({
       success: true,
@@ -77,78 +81,80 @@ export async function GET(request: NextRequest) {
           itemCount: cartItems.reduce((sum, item) => sum + item.quantity, 0),
         },
       },
-    })
+    });
   } catch (error) {
-    console.error('Error fetching cart:', error)
+    console.error("Error fetching cart:", error);
     return NextResponse.json(
       {
         success: false,
         error: {
-          code: 'INTERNAL_SERVER_ERROR',
-          message: 'Failed to fetch cart',
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Failed to fetch cart",
         },
       },
       { status: 500 }
-    )
+    );
   }
 }
 
 export async function POST(request: NextRequest) {
   try {
-    // Get NextAuth.js session
-    const session = await getServerSession(authOptions)
-    
+    // Get NextAuth.js session with request context
+    const session = await getServerSession(authOptions, {
+      req: request,
+    });
+
     if (!session?.user?.id) {
       return NextResponse.json(
         {
           success: false,
           error: {
-            code: 'UNAUTHORIZED',
-            message: 'Authentication required',
+            code: "UNAUTHORIZED",
+            message: "Authentication required",
           },
         },
         { status: 401 }
-      )
+      );
     }
 
-    const user = session.user
+    const user = session.user;
 
-    const body = await request.json()
-    const validation = addToCartSchema.safeParse(body)
+    const body = await request.json();
+    const validation = addToCartSchema.safeParse(body);
 
     if (!validation.success) {
       return NextResponse.json(
         {
           success: false,
           error: {
-            code: 'VALIDATION_ERROR',
-            message: 'Invalid input',
+            code: "VALIDATION_ERROR",
+            message: "Invalid input",
             details: validation.error.issues,
           },
         },
         { status: 400 }
-      )
+      );
     }
 
-    const { productId, variantId, quantity } = validation.data
+    const { productId, variantId, quantity } = validation.data;
 
     // Verify product exists
     const product = await prisma.product.findUnique({
       where: { id: productId },
       include: { variants: true },
-    })
+    });
 
     if (!product) {
       return NextResponse.json(
         {
           success: false,
           error: {
-            code: 'PRODUCT_NOT_FOUND',
-            message: 'Product not found',
+            code: "PRODUCT_NOT_FOUND",
+            message: "Product not found",
           },
         },
         { status: 404 }
-      )
+      );
     }
 
     // Verify variant exists if provided
@@ -158,19 +164,19 @@ export async function POST(request: NextRequest) {
           id: variantId,
           productId: productId,
         },
-      })
+      });
 
       if (!variant) {
         return NextResponse.json(
           {
             success: false,
             error: {
-              code: 'VARIANT_NOT_FOUND',
-              message: 'Product variant not found',
+              code: "VARIANT_NOT_FOUND",
+              message: "Product variant not found",
             },
           },
           { status: 404 }
-        )
+        );
       }
 
       // Check variant stock
@@ -179,12 +185,12 @@ export async function POST(request: NextRequest) {
           {
             success: false,
             error: {
-              code: 'INSUFFICIENT_STOCK',
+              code: "INSUFFICIENT_STOCK",
               message: `Only ${variant.quantity} items available`,
             },
           },
           { status: 400 }
-        )
+        );
       }
     } else {
       // Check product stock
@@ -193,12 +199,12 @@ export async function POST(request: NextRequest) {
           {
             success: false,
             error: {
-              code: 'INSUFFICIENT_STOCK',
+              code: "INSUFFICIENT_STOCK",
               message: `Only ${product.quantity} items available`,
             },
           },
           { status: 400 }
-        )
+        );
       }
     }
 
@@ -209,9 +215,9 @@ export async function POST(request: NextRequest) {
         productId,
         variantId: variantId || null,
       },
-    })
+    });
 
-    let cartItem
+    let cartItem;
 
     if (existingItem) {
       // Update existing item quantity
@@ -227,7 +233,7 @@ export async function POST(request: NextRequest) {
           },
           variant: true,
         },
-      })
+      });
     } else {
       // Create new cart item
       cartItem = await prisma.cartItem.create({
@@ -246,34 +252,34 @@ export async function POST(request: NextRequest) {
           },
           variant: true,
         },
-      })
+      });
     }
 
     return NextResponse.json(
       {
         success: true,
-        message: 'Item added to cart successfully',
+        message: "Item added to cart successfully",
         data: cartItem,
       },
       { status: 201 }
-    )
+    );
   } catch (error) {
-    console.error('Error adding to cart:', error)
-    console.error('Error details:', {
-      message: error instanceof Error ? error.message : 'Unknown error',
+    console.error("Error adding to cart:", error);
+    console.error("Error details:", {
+      message: error instanceof Error ? error.message : "Unknown error",
       stack: error instanceof Error ? error.stack : undefined,
-      name: error instanceof Error ? error.name : undefined
-    })
+      name: error instanceof Error ? error.name : undefined,
+    });
     return NextResponse.json(
       {
         success: false,
         error: {
-          code: 'INTERNAL_SERVER_ERROR',
-          message: 'An error occurred while adding item to cart',
-          details: error instanceof Error ? error.message : 'Unknown error'
+          code: "INTERNAL_SERVER_ERROR",
+          message: "An error occurred while adding item to cart",
+          details: error instanceof Error ? error.message : "Unknown error",
         },
       },
       { status: 500 }
-    )
+    );
   }
 }
