@@ -1,6 +1,6 @@
 'use client'
 
-import { useCustomAuth } from '@/hooks/useCustomAuth'
+import { useSession } from 'next-auth/react'
 import { useWishlistStore } from '@/stores/wishlistStore'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
@@ -16,7 +16,7 @@ export default function WishlistButton({
   className = '',
   size = 'md',
 }: WishlistButtonProps) {
-  const { user } = useCustomAuth()
+  const { data: session, status } = useSession()
   const router = useRouter()
   const { addToWishlist, removeFromWishlist, isInWishlist, isLoading } = useWishlistStore()
   const [isToggling, setIsToggling] = useState(false)
@@ -24,7 +24,11 @@ export default function WishlistButton({
   const inWishlist = isInWishlist(productId)
 
   const handleToggleWishlist = async () => {
-    if (!user) {
+    if (status === 'loading') {
+      return // Wait for auth to load
+    }
+    
+    if (!session?.user) {
       router.push('/auth/signin')
       return
     }

@@ -1,6 +1,6 @@
 'use client'
 
-import { useCustomAuth } from '@/hooks/useCustomAuth'
+import { useSession } from 'next-auth/react'
 import { useCartStore } from '@/stores/cartStore'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
@@ -20,13 +20,17 @@ export default function AddToCartButton({
   children,
   disabled = false,
 }: AddToCartButtonProps) {
-  const { user } = useCustomAuth()
+  const { data: session, status } = useSession()
   const router = useRouter()
   const { addToCart, isLoading } = useCartStore()
   const [isAdding, setIsAdding] = useState(false)
 
   const handleAddToCart = async () => {
-    if (!user) {
+    if (status === 'loading') {
+      return // Wait for auth to load
+    }
+    
+    if (!session?.user) {
       router.push('/auth/signin')
       return
     }

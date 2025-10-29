@@ -1,6 +1,6 @@
 "use client";
 
-import { useAuth } from "@/contexts/AuthContext";
+import { useSession } from "next-auth/react";
 import { useCartStore } from "@/stores/cartStore";
 import { ProductType } from "@/types";
 import { ShoppingCart } from "lucide-react";
@@ -16,7 +16,7 @@ const ProductCard = ({ product }: { product: ProductType }) => {
     color: product.colors?.[0] || 'default',
   });
 
-  const { user, loading: authLoading } = useAuth();
+  const { data: session, status } = useSession();
   const _router = useRouter();
   const { addToCart } = useCartStore();
 
@@ -35,12 +35,12 @@ const ProductCard = ({ product }: { product: ProductType }) => {
 
   const handleAddToCart = async () => {
     // Handle authentication states intelligently
-    if (authLoading) {
+    if (status === 'loading') {
       toast.info("Please wait, verifying authentication...");
       return;
     }
 
-    if (!user) {
+    if (!session?.user) {
       toast.info("Please sign in to add items to your cart");
       _router.push('/auth/signin/');
       return;
