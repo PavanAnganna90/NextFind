@@ -95,12 +95,24 @@ export function generateJWTToken(user: CustomUser): string {
 export function verifyJWTToken(token: string): CustomUser | null {
   try {
     const decoded = jwt.verify(token, JWT_SECRET) as any;
+    
+    // Handle both custom JWT and NextAuth.js JWT formats
+    const userId = decoded.userId || decoded.sub;
+    const email = decoded.email;
+    const name = decoded.name;
+    const role = decoded.role || 'USER';
+    const image = decoded.image || decoded.picture;
+    
+    if (!userId || !email) {
+      return null;
+    }
+
     return {
-      id: decoded.userId,
-      email: decoded.email,
-      name: decoded.name,
-      role: decoded.role,
-      image: decoded.image,
+      id: userId,
+      email: email,
+      name: name || '',
+      role: role,
+      image: image,
     };
   } catch (error) {
     console.error("❌ JWT verification failed:", error);
@@ -115,7 +127,19 @@ export function getTokenFromRequest(request: NextRequest): string | null {
     return authHeader.substring(7);
   }
 
-  // Try to get token from cookie
+  // Try to get token from NextAuth.js cookies
+  const nextAuthToken = request.cookies.get("next-auth.session-token");
+  if (nextAuthToken?.value) {
+    return nextAuthToken.value;
+  }
+
+  // Try alternative NextAuth cookie names
+  const nextAuthTokenAlt = request.cookies.get("__Secure-next-auth.session-token");
+  if (nextAuthTokenAlt?.value) {
+    return nextAuthTokenAlt.value;
+  }
+
+  // Fallback to custom auth-token cookie
   const tokenCookie = request.cookies.get("auth-token");
   return tokenCookie?.value || null;
 }
