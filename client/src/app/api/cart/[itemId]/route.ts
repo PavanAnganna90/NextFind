@@ -1,4 +1,5 @@
-import { getServerUser } from '@/lib/auth-utils'
+import { getServerSession } from 'next-auth/next'
+import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
@@ -12,9 +13,9 @@ export async function PUT(
   { params }: { params: Promise<{ itemId: string }> }
 ) {
   try {
-    const user = await getServerUser(request)
+    const session = await getServerSession(authOptions)
 
-    if (!user?.id) {
+    if (!session?.user?.id) {
       return NextResponse.json(
         {
           success: false,
@@ -26,6 +27,8 @@ export async function PUT(
         { status: 401 }
       )
     }
+
+    const user = session.user
 
     const { itemId } = await params
     const body = await request.json()
@@ -128,9 +131,9 @@ export async function DELETE(
   { params }: { params: Promise<{ itemId: string }> }
 ) {
   try {
-    const user = await getServerUser(request)
+    const session = await getServerSession(authOptions)
 
-    if (!user?.id) {
+    if (!session?.user?.id) {
       return NextResponse.json(
         {
           success: false,
@@ -142,6 +145,8 @@ export async function DELETE(
         { status: 401 }
       )
     }
+
+    const user = session.user
 
     const { itemId } = await params
 

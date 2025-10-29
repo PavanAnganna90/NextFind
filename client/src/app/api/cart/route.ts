@@ -1,4 +1,5 @@
-import { getTokenFromRequest, verifyJWTToken } from '@/lib/custom-auth'
+import { getServerSession } from 'next-auth/next'
+import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
@@ -11,10 +12,10 @@ const addToCartSchema = z.object({
 
 export async function GET(request: NextRequest) {
   try {
-    // Get token from request
-    const token = getTokenFromRequest(request)
+    // Get NextAuth.js session
+    const session = await getServerSession(authOptions)
     
-    if (!token) {
+    if (!session?.user?.id) {
       return NextResponse.json(
         { 
           success: false,
@@ -27,21 +28,7 @@ export async function GET(request: NextRequest) {
       )
     }
 
-    // Verify JWT token
-    const user = verifyJWTToken(token)
-    
-    if (!user) {
-      return NextResponse.json(
-        { 
-          success: false,
-          error: {
-            code: 'UNAUTHORIZED',
-            message: 'Invalid authentication token',
-          },
-        },
-        { status: 401 }
-      )
-    }
+    const user = session.user
 
     const cartItems = await prisma.cartItem.findMany({
       where: { userId: user.id },
@@ -108,10 +95,10 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
-    // Get token from request
-    const token = getTokenFromRequest(request)
+    // Get NextAuth.js session
+    const session = await getServerSession(authOptions)
     
-    if (!token) {
+    if (!session?.user?.id) {
       return NextResponse.json(
         {
           success: false,
@@ -124,21 +111,7 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Verify JWT token
-    const user = verifyJWTToken(token)
-    
-    if (!user) {
-      return NextResponse.json(
-        {
-          success: false,
-          error: {
-            code: 'UNAUTHORIZED',
-            message: 'Invalid authentication token',
-          },
-        },
-        { status: 401 }
-      )
-    }
+    const user = session.user
 
     const body = await request.json()
     const validation = addToCartSchema.safeParse(body)
