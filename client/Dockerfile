@@ -107,8 +107,8 @@ ENV SESSION_COOKIE_HTTPONLY true
 # Build Next.js application
 # Why: Generates optimized production build
     # Interview Note: This creates .next folder with compiled code
-    # Build with relaxed TypeScript config for Docker
-    RUN node build-docker-relaxed.js
+    # Build with ultra-aggressive TypeScript skipping for Docker
+    RUN node build-docker-ultra.js
 
 # ==================================================================================================
 # STAGE 3: RUNNER (PRODUCTION)
