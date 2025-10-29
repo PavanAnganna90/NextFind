@@ -1,6 +1,6 @@
 'use client'
 
-import { useCustomAuth } from '@/hooks/useCustomAuth'
+import { useSession } from 'next-auth/react'
 import { useCartStore } from '@/stores/cartStore'
 import Image from 'next/image'
 import Link from 'next/link'
@@ -11,8 +11,10 @@ interface CartSidebarProps {
 }
 
 export default function CartSidebar({ isOpen, onClose }: CartSidebarProps) {
-  const { user } = useCustomAuth()
+  const { data: session, status } = useSession()
   const { items, summary, isLoading, error, updateQuantity, removeFromCart } = useCartStore()
+  
+  const user = session?.user
 
   const handleQuantityChange = async (itemId: string, newQuantity: number) => {
     if (newQuantity < 1) return

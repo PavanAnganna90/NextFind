@@ -1,6 +1,6 @@
 "use client";
 
-import { useAuth } from "@/contexts/AuthContext";
+import { useSession, signOut } from "next-auth/react";
 import { useCartStore } from "@/stores/cartStore";
 import { useWishlistStore } from "@/stores/wishlistStore";
 import { Heart, Home } from "lucide-react";
@@ -12,10 +12,13 @@ import CartSidebar from "./CartSidebar";
 import NotificationBell from "./NotificationBell";
 
 const Navbar = () => {
-  const { user, logout, loading } = useAuth();
+  const { data: session, status } = useSession();
   const { summary, fetchCart } = useCartStore();
   const { items: wishlistItems, fetchWishlist } = useWishlistStore();
   const [isCartOpen, setIsCartOpen] = useState(false);
+
+  const user = session?.user;
+  const loading = status === 'loading';
 
   // Debug logging
   console.log('Navbar - user:', user, 'loading:', loading);
@@ -88,7 +91,7 @@ const Navbar = () => {
             <div className="flex items-center space-x-4">
               <span className="text-sm text-gray-700">Hello, {user.name}</span>
               <button
-                onClick={() => logout()}
+                onClick={() => signOut()}
                 className="text-sm text-gray-600 hover:text-gray-900"
               >
                 Sign out
