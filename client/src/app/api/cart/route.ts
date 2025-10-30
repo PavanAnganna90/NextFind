@@ -88,6 +88,7 @@ export async function GET(request: NextRequest) {
         error: {
           code: "INTERNAL_SERVER_ERROR",
           message: "Failed to fetch cart",
+          details: error instanceof Error ? error.message : String(error),
         },
       },
       { status: 500 }
