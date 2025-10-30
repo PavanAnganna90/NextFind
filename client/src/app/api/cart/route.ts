@@ -12,10 +12,8 @@ const addToCartSchema = z.object({
 
 export async function GET(request: NextRequest) {
   try {
-    // Get NextAuth.js session with request context
-    const session = await getServerSession(authOptions, {
-      req: request,
-    });
+    // Get NextAuth.js session (App Router: no req/res)
+    const session = await getServerSession(authOptions);
 
     if (!session?.user?.id) {
       return NextResponse.json(
@@ -99,10 +97,8 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
-    // Get NextAuth.js session with request context
-    const session = await getServerSession(authOptions, {
-      req: request,
-    });
+    // Get NextAuth.js session (App Router: no req/res)
+    const session = await getServerSession(authOptions);
 
     if (!session?.user?.id) {
       return NextResponse.json(

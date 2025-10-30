@@ -13,9 +13,7 @@ export async function PUT(
   { params }: { params: Promise<{ itemId: string }> }
 ) {
   try {
-    const session = await getServerSession(authOptions, {
-      req: request,
-    });
+    const session = await getServerSession(authOptions);
 
     if (!session?.user?.id) {
       return NextResponse.json(
@@ -134,9 +132,7 @@ export async function DELETE(
   { params }: { params: Promise<{ itemId: string }> }
 ) {
   try {
-    const session = await getServerSession(authOptions, {
-      req: request,
-    });
+    const session = await getServerSession(authOptions);
 
     if (!session?.user?.id) {
       return NextResponse.json(
