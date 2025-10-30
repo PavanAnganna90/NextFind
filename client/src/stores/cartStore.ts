@@ -80,11 +80,29 @@ export const useCartStore = create<CartState & CartActions>()(
             credentials: 'include', // Ensure cookies are sent
           })
           
-          if (!response.ok) {
-            throw new Error(`HTTP ${response.status}: ${response.statusText}`)
+          // Always attempt to parse JSON, even on non-OK to surface server error details
+          let data: any = null
+          try {
+            data = await response.json()
+          } catch {
+            // ignore JSON parse errors and fall back to status text
           }
+
+          if (!response.ok) {
+            // 401 → unauthenticated: clear items gracefully rather than throwing
+            if (response.status === 401) {
+              set({ items: [], summary: initialSummary, isLoading: false, error: null })
+              return
+            }
+            set({
+              error: (data && data.error && data.error.message) ? data.error.message : `HTTP ${response.status}: ${response.statusText}`,
+              isLoading: false,
+            })
+            return
+          }
+
+          // OK branch
           
-          const data = await response.json()
 
           if (data.success) {
             set({
@@ -123,12 +141,14 @@ export const useCartStore = create<CartState & CartActions>()(
               quantity,
             }),
           })
-
-          if (!response.ok) {
-            throw new Error(`HTTP ${response.status}: ${response.statusText}`)
+          
+          // Parse JSON even when non-OK to get error details
+          let data: any = null
+          try {
+            data = await response.json()
+          } catch {
+            // ignore
           }
-
-          const data = await response.json()
 
           if (data.success) {
             // Always refresh cart from database to ensure consistency
@@ -145,8 +165,10 @@ export const useCartStore = create<CartState & CartActions>()(
               errorMessage = data.error.message || 'Insufficient stock'
             } else if (data.error?.code === 'VALIDATION_ERROR') {
               errorMessage = 'Invalid product data'
-            } else if (data.error?.message) {
+            } else if (data?.error?.message) {
               errorMessage = data.error.message
+            } else if (!response.ok) {
+              errorMessage = `HTTP ${response.status}: ${response.statusText}`
             }
             
             set({
