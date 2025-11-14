@@ -62,8 +62,8 @@ When using BMAD agents in a web UI (like ChatGPT, Claude, or Gemini):
 
 ```
 e-commerce-ui/
-├── admin/                 # Admin dashboard
-├── client/                # Client storefront
+├── apps/admin/                 # Admin dashboard
+├── apps/client/                # Client storefront
 ├── bmad/                  # BMAD-METHOD v6 integration
 │   ├── agents/           # Agent configurations
 │   ├── stories/          # Development stories

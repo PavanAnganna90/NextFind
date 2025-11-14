@@ -1,0 +1,80 @@
+# ==================================================================================================
+# DATADOG AGENT DEPLOYMENT - ARGO CD APPLICATION (HELM CHART)
+# ==================================================================================================
+#
+# Purpose: Deploy DataDog Agent using official Helm chart via Argo CD
+# Why: Industry-standard approach using Helm for easier management and updates
+#
+# Interview Topics:
+# - Argo CD Helm application configuration
+# - GitOps deployment patterns
+# - Helm chart versioning and updates
+# - Monitoring infrastructure as code
+#
+# ==================================================================================================
+
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: datadog-agent
+  namespace: argocd
+  labels:
+    app: datadog-agent
+    managed-by: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "-1"  # Deploy before other apps
+    # Datadog CD Visibility annotations
+    dd_env: production
+    dd_service: datadog-agent
+    dd_k8s_cluster: ecommerce-k8s
+    dd_customtags: "team:platform,component:monitoring"
+spec:
+  project: default
+  source:
+    repoURL: https://helm.datadoghq.com
+    chart: datadog
+    targetRevision: 3.74.1  # Pin to stable version - update as needed
+    helm:
+      # Inline values - API key is managed via Secret named 'datadog-secret' with key 'api-key'
+      # Create secret: kubectl create secret generic datadog-secret --from-literal api-key=<YOUR_API_KEY> -n monitoring
+      values: |
+        datadog:
+          apiKeyExistingSecret: datadog-secret
+          apiKeyExistingSecretKey: api-key
+          site: us5.datadoghq.com
+          clusterName: ecommerce-k8s
+          tags:
+            - "env:production"
+            - "service:ecommerce"
+            - "team:sre"
+            - "cluster:ecommerce-k8s"
+      # Alternative: Reference values file from Git repository (requires Argo CD 2.6+)
+      # Use multi-source Application spec with sources (plural) instead of source
+      # See README.md for multi-source configuration example
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: monitoring
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+      allowEmpty: false
+    syncOptions:
+      - CreateNamespace=true
+      - PrunePropagationPolicy=foreground
+      - PruneLast=true
+    retry:
+      limit: 5
+      backoff:
+        duration: 5s
+        factor: 2
+        maxDuration: 3m
+  # Health checks
+  healthChecks:
+    - type: Deployment
+      name: datadog-cluster-agent
+      namespace: monitoring
+    - type: DaemonSet
+      name: datadog-agent
+      namespace: monitoring
+

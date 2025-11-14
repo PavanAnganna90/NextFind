@@ -21,9 +21,9 @@ Use `apps/*/.env.example` for surface-specific overrides when applicable.
 ### Running Locally
 ```bash
 pnpm install
-docker compose up -d postgres redis
-pnpm --filter admin dev
-pnpm --filter client dev
+docker compose -f infra/docker/docker-compose.yml up -d postgres redis
+pnpm --filter ./apps/admin dev
+pnpm --filter ./apps/client dev
 ```
 
 ### Tests & Quality Gates
@@ -31,13 +31,13 @@ pnpm --filter client dev
 pnpm lint
 pnpm test
 ```
-Add component/unit tests for every change; use `pnpm --filter client test -- --watch` for local loops.
+Add component/unit tests for every change; use `pnpm --filter ./apps/client test -- --watch` for local loops.
 
 ### Docker Images
 ```bash
 docker build -t nextfind/admin -f apps/admin/Dockerfile .
 docker build -t nextfind/client -f apps/client/Dockerfile .
-docker compose -f docker-compose.prod.yml up -d
+docker compose -f infra/docker/docker-compose.prod.yml up -d
 ```
 
 ### Kubernetes Deployment
@@ -58,7 +58,7 @@ Key manifests:
 
 ### Deployment Checklist
 1. `pnpm lint && pnpm test`
-2. `docker compose build` or `docker build` for individual apps
+2. `docker compose -f infra/docker/docker-compose.yml build` or `docker build` for individual apps
 3. Push images to GHCR or Docker Hub
 4. `kubectl apply -k infra/kubernetes/overlays/prod`
 5. Run smoke tests (`scripts/smoke-check.sh`) and verify Datadog dashboards

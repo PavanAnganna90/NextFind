@@ -289,12 +289,12 @@ ${colors.reset}`);
   let totalWarnings = 0;
 
   // Validate client configuration
-  const clientEnvPath = path.join(__dirname, '..', 'client', '.env.local');
+  const clientEnvPath = path.join(__dirname, '..', 'apps', 'client', '.env.local');
   const clientConfig = loadEnvFile(clientEnvPath);
   
   if (Object.keys(clientConfig).length === 0) {
     log.error('Client .env.local file not found or empty');
-    log.info('Please copy client/.env.example to client/.env.local and configure it');
+    log.info('Please copy apps/client/.env.example to apps/client/.env.local and configure it');
     totalErrors++;
   } else {
     const clientResult = validateConfig(clientConfig, clientConfigSchema, 'Client');
@@ -306,12 +306,12 @@ ${colors.reset}`);
   }
 
   // Validate admin configuration
-  const adminEnvPath = path.join(__dirname, '..', 'admin', '.env.local');
+  const adminEnvPath = path.join(__dirname, '..', 'apps', 'admin', '.env.local');
   const adminConfig = loadEnvFile(adminEnvPath);
   
   if (Object.keys(adminConfig).length === 0) {
     log.error('Admin .env.local file not found or empty');
-    log.info('Please copy admin/.env.example to admin/.env.local and configure it');
+    log.info('Please copy apps/admin/.env.example to apps/admin/.env.local and configure it');
     totalErrors++;
   } else {
     const adminResult = validateConfig(adminConfig, adminConfigSchema, 'Admin');
@@ -340,7 +340,7 @@ ${colors.reset}`);
   console.log(`\n${colors.cyan}Next steps:${colors.reset}`);
   console.log('1. Fix any errors or warnings above');
   console.log('2. Start PostgreSQL and Redis services');
-  console.log('3. Run "pnpm dev" in both client and admin directories');
+  console.log('3. Run "pnpm dev" in both apps/client and apps/admin directories');
   console.log('4. Visit http://localhost:3000 (client) and http://localhost:3001 (admin)');
 }
 

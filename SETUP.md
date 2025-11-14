@@ -25,12 +25,13 @@ cd e-commerce-ui
 
 ```bash
 # Install client dependencies
-cd client
+cd apps/client
 pnpm install
 
 # Install admin dependencies
 cd ../admin
 pnpm install
+cd ../..
 ```
 
 ### 3. Environment Configuration
@@ -38,11 +39,11 @@ pnpm install
 #### Client Application Setup
 
 ```bash
-cd client
+cd apps/client
 cp .env.example .env.local
 ```
 
-Edit `client/.env.local` with your configuration:
+Edit `apps/client/.env.local` with your configuration:
 
 ```env
 # Application Configuration
@@ -64,11 +65,11 @@ NEXTAUTH_SECRET="your_32_character_secret_here"
 #### Admin Application Setup
 
 ```bash
-cd admin
+cd apps/admin
 cp .env.example .env.local
 ```
 
-Edit `admin/.env.local` with your configuration:
+Edit `apps/admin/.env.local` with your configuration:
 
 ```env
 # Application Configuration

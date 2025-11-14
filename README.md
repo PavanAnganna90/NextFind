@@ -25,8 +25,8 @@ NextFind is an end-to-end commerce platform with a customer storefront, an analy
 ## 🗂 Repository Layout
 ```
 apps/
-  client/            # Storefront Next.js app
-  admin/             # Admin dashboard Next.js app
+  apps/client/            # Storefront Next.js app
+  apps/admin/             # Admin dashboard Next.js app
 services/
   api/               # Backend utilities and scripts
 infra/
@@ -82,12 +82,12 @@ See `docs/architecture.md` for sequence diagrams, deployment topologies, and dat
    ```
 3. **Run local services**
    ```bash
-   docker compose up -d postgres redis
+   docker compose -f infra/docker/docker-compose.yml up -d postgres redis
    ```
 4. **Start apps**
    ```bash
-   pnpm --filter admin dev
-   pnpm --filter client dev
+   pnpm --filter ./apps/admin dev
+   pnpm --filter ./apps/client dev
    ```
 
 Applications are served on `http://localhost:3000` (storefront) and `http://localhost:3001` (admin).
@@ -101,9 +101,9 @@ Applications are served on `http://localhost:3000` (storefront) and `http://loca
 | `pnpm dev` | Run both apps via Turborepo |
 | `pnpm lint` | ESLint + style checks |
 | `pnpm test` | Vitest/Playwright suites |
-| `pnpm --filter client build` | Production build for storefront |
-| `pnpm --filter admin build` | Production build for admin |
-| `docker compose up` | Full stack (apps + db + redis) |
+| `pnpm --filter ./apps/client build` | Production build for storefront |
+| `pnpm --filter ./apps/admin build` | Production build for admin |
+| `docker compose -f infra/docker/docker-compose.yml up` | Full stack (apps + db + redis) |
 | `make kube-apply` | Apply manifests to target cluster |
 
 > Complete command reference lives in `docs/operations.md`.
@@ -111,7 +111,7 @@ Applications are served on `http://localhost:3000` (storefront) and `http://loca
 ---
 
 ## ☁️ Deployment
-- **Docker**: `docker compose -f docker-compose.prod.yml up -d`
+- **Docker**: `docker compose -f infra/docker/docker-compose.prod.yml up -d`
 - **Kubernetes**: apply manifests under `infra/kubernetes/overlays/{dev,prod}`
 - **Monitoring**: install Datadog via `infra/monitoring/datadog-values.yaml`
 

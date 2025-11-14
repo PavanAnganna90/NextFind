@@ -59,7 +59,7 @@ api/
 ├── orders/                 # Order management
 │   ├── index.ts
 │   └── [id].ts
-└── admin/                  # Admin operations
+└── apps/admin/                  # Admin operations
     ├── dashboard.ts
     └── analytics.ts
 ```

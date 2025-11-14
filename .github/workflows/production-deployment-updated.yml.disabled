@@ -47,16 +47,16 @@ jobs:
               with:
                   filters: |
                       client:
-                        - 'client/**'
+                        - 'apps/client/**'
                         - 'package.json'
                         - 'package-lock.json'
                       admin:
-                        - 'admin/**'
-                        - 'admin/package.json'
-                        - 'admin/package-lock.json'
+                        - 'apps/admin/**'
+                        - 'apps/admin/package.json'
+                        - 'apps/admin/package-lock.json'
                       k8s:
-                        - 'k8s-manifests/**'
-                        - 'kubernetes-interview-prep/k8s-manifests/**'
+                        - 'infra/kubernetes/**'
+                        - 'kubernetes-interview-prep/infra/kubernetes/**'
 
             - name: 🍳 Setup Node.js
               uses: actions/setup-node@v4
@@ -69,9 +69,9 @@ jobs:
                   path: |
                       ~/.npm
                       node_modules
-                      client/node_modules
-                      admin/node_modules
-                  key: ${{ runner.os }}-npm-${{ hashFiles('package-lock.json', 'admin/package-lock.json') }}
+                      apps/client/node_modules
+                      apps/admin/node_modules
+                  key: ${{ runner.os }}-npm-${{ hashFiles('package-lock.json', 'apps/admin/package-lock.json') }}
                   restore-keys: |
                       ${{ runner.os }}-npm-
 
@@ -119,7 +119,7 @@ jobs:
               uses: docker/build-push-action@v5
               with:
                   context: ./client
-                  file: ./client/Dockerfile
+                  file: ./apps/client/Dockerfile
                   push: true
                   tags: |
                       ${{ env.DOCKER_HUB_REGISTRY }}/${{ env.DOCKER_HUB_REPOSITORY }}-client:${{ env.IMAGE_TAG }}
@@ -131,7 +131,7 @@ jobs:
               uses: docker/build-push-action@v5
               with:
                   context: ./admin
-                  file: ./admin/Dockerfile
+                  file: ./apps/admin/Dockerfile
                   push: true
                   tags: |
                       ${{ env.DOCKER_HUB_REGISTRY }}/${{ env.DOCKER_HUB_REPOSITORY }}-admin:${{ env.IMAGE_TAG }}
@@ -177,7 +177,7 @@ jobs:
                   export KUBECONFIG=kubeconfig
 
                   # Deploy using Kustomize with new paths
-                  kubectl apply -k kubernetes-interview-prep/k8s-manifests/overlays/prod
+                  kubectl apply -k kubernetes-interview-prep/infra/kubernetes/overlays/prod
 
                   # Wait for rollout
                   kubectl rollout status deployment/ecommerce-frontend -n ${{ env.KUBERNETES_NAMESPACE }} --timeout=300s

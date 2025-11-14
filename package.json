@@ -4,19 +4,19 @@
   "description": "Full-stack e-commerce platform with Next.js",
   "private": true,
   "workspaces": [
-    "client",
-    "admin"
+    "apps/client",
+    "apps/admin"
   ],
   "scripts": {
-    "dev": "concurrently \"npm run dev --workspace=client\" \"npm run dev --workspace=admin\"",
-    "build": "npm run build --workspace=client && npm run build --workspace=admin",
-    "start": "concurrently \"npm run start --workspace=client\" \"npm run start --workspace=admin\"",
-    "lint": "npm run lint --workspace=client && npm run lint --workspace=admin",
+    "dev": "concurrently \"npm run dev --workspace=apps/client\" \"npm run dev --workspace=apps/admin\"",
+    "build": "npm run build --workspace=apps/client && npm run build --workspace=apps/admin",
+    "start": "concurrently \"npm run start --workspace=apps/client\" \"npm run start --workspace=apps/admin\"",
+    "lint": "npm run lint --workspace=apps/client && npm run lint --workspace=apps/admin",
     "setup": "./setup.sh",
     "validate-config": "node scripts/validate-config.js",
-    "install-all": "npm install && npm install --workspace=client && npm install --workspace=admin",
-    "clean": "npm run clean --workspace=client && npm run clean --workspace=admin",
-    "type-check": "npm run type-check --workspace=client && npm run type-check --workspace=admin"
+    "install-all": "npm install && npm install --workspace=apps/client && npm install --workspace=apps/admin",
+    "clean": "npm run clean --workspace=apps/client && npm run clean --workspace=apps/admin",
+    "type-check": "npm run type-check --workspace=apps/client && npm run type-check --workspace=apps/admin"
   },
   "devDependencies": {
     "concurrently": "^8.2.2"

@@ -154,7 +154,7 @@ jobs:
                   echo "🚀 Deploying application to Minikube..."
 
                   # Deploy using our existing script
-                  cd k8s-manifests/scripts
+                  cd infra/kubernetes/scripts
                   chmod +x deploy.sh
 
                   # Set environment variables for deployment

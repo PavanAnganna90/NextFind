@@ -10,9 +10,9 @@
 
 ### Database & Cache
 - **Symptom**: `ECONNREFUSED` for PostgreSQL  
-  **Fix**: `docker compose ps` to ensure services are running. Apply migrations with `pnpm --filter admin prisma migrate deploy`.
+  **Fix**: `docker compose -f infra/docker/docker-compose.yml ps` to ensure services are running. Apply migrations with `pnpm --filter ./apps/admin prisma migrate deploy`.
 - **Symptom**: Stale carts/wishlists  
-  **Fix**: Flush Redis (`docker compose exec redis redis-cli FLUSHALL`) and restart the client app.
+  **Fix**: Flush Redis (`docker compose -f infra/docker/docker-compose.yml exec redis redis-cli FLUSHALL`) and restart the client app.
 
 ### Kubernetes
 - **Symptom**: Pods stuck in `ImagePullBackOff`  
