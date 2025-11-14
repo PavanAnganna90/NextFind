@@ -102,7 +102,6 @@ dist
 
 # Gatsby files
 .cache/
-public
 
 # Vuepress build output
 .vuepress/dist
@@ -130,8 +129,10 @@ public
 .pnp.*
 
 # IDEs and editors
+.cursor/
 .vscode/
 .idea/
+*.code-workspace
 *.swp
 *.swo
 *~
@@ -146,7 +147,7 @@ ehthumbs.db
 Thumbs.db
 
 # Logs
-logs
+logs/
 *.log
 
 # Database
@@ -154,9 +155,14 @@ logs
 *.sqlite3
 *.db
 
-# Temporary files
+# Temporary & scratch files
 tmp/
 temp/
+scratch/
+notes/
+playground/
+junk/
+old/
 
 # Docker
 # .dockerignore  # Commented out to allow client .dockerignore for CI/CD
@@ -182,9 +188,10 @@ storybook-static/
 # Local development
 .local
 .cache
+*.tmp
+*.bak
 
 # Backup files
-*.bak
 *.backup
 *.old
 
@@ -203,11 +210,15 @@ docs/.docusaurus/
 # Local configuration overrides
 config.local.js
 config.local.json
-.clinerules/byterover-rules.md
-.kilocode/rules/byterover-rules.md
-.roo/rules/byterover-rules.md
-.windsurf/rules/byterover-rules.md
-.cursor/rules/byterover-rules.mdc
-.kiro/steering/byterover-rules.md
-.qoder/rules/byterover-rules.md
-.augment/rules/byterover-rules.md
+
+# Secrets & credentials
+*.env
+*.env.*
+*.pem
+*.pfx
+kubeconfig
+
+# Cookie/test artifacts
+*cookie*.txt
+*_cookies.txt
+*_test_cookies.txt
