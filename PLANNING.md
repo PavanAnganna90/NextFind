@@ -34,14 +34,14 @@
 ### File Structure
 ```
 e-commerce-ui/
-├── admin/                 # Admin dashboard application
+├── apps/admin/                 # Admin dashboard application
 │   ├── src/
 │   │   ├── app/          # Next.js app router
 │   │   ├── components/   # Reusable UI components
 │   │   ├── hooks/        # Custom React hooks
 │   │   └── lib/          # Utility functions
 │   └── package.json
-├── client/               # Client storefront application
+├── apps/client/               # Client storefront application
 │   ├── src/
 │   │   ├── app/          # Next.js app router
 │   │   ├── components/   # E-commerce components

@@ -36,7 +36,13 @@
   - Documented agent interaction patterns
 
 #### 🔄 In Progress
-*No tasks currently in progress*
+- [ ] **2025-11-14** - Publish-ready open-source repo upgrade
+  - Rewrite README, CONTRIBUTING, CHANGELOG, and LICENSE
+  - Add CI workflow plus issue/PR templates for community onboarding
+  - Curate docs (`docs/architecture.md`, `docs/operations.md`, `docs/troubleshooting.md`)
+- [x] **2025-11-14** - Recreate `NextFind` repo detached from fork
+  - Removed fork relationship and pushed code to a fresh `NextFind` origin
+  - Ensured new repo keeps existing history but is fully owned
 
 #### ⏳ Pending Tasks
 *Ready for next sprint planning*

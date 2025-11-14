@@ -120,7 +120,7 @@ deploy_to_kubernetes() {
     
     # Deploy using existing deployment script
     log_info "Running deployment script..."
-    cd "$(dirname "$0")/../k8s-manifests/scripts"
+    cd "$(dirname "$0")/../infra/kubernetes/scripts"
     chmod +x deploy.sh
     
     export NAMESPACE="$NAMESPACE"

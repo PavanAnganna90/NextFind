@@ -138,7 +138,7 @@ scan_container_security() {
 analyze_dockerfile() {
     log "📋 Analyzing Dockerfile security..."
     
-    local dockerfile="$PROJECT_ROOT/client/Dockerfile"
+    local dockerfile="$PROJECT_ROOT/apps/client/Dockerfile"
     local report_file="$REPORTS_DIR/dockerfile_analysis_${TIMESTAMP}.txt"
     
     # Check for security best practices
@@ -166,7 +166,7 @@ analyze_dockerfile() {
         fi
         
         # Check for .dockerignore
-        if [ -f "$PROJECT_ROOT/client/.dockerignore" ]; then
+        if [ -f "$PROJECT_ROOT/apps/client/.dockerignore" ]; then
             echo "✅ .dockerignore file present"
         else
             echo "❌ .dockerignore file missing"
@@ -218,7 +218,7 @@ analyze_dockerfile() {
 scan_dependencies() {
     log "📦 Scanning application dependencies..."
     
-    cd "$PROJECT_ROOT/client"
+    cd "$PROJECT_ROOT/apps/client"
     
     # NPM audit
     local audit_file="$REPORTS_DIR/npm_audit_${TIMESTAMP}.json"
@@ -311,7 +311,7 @@ check_runtime_security() {
     # Check if Falco is running
     if ! docker ps | grep -q "falco"; then
         warning "Falco not running, starting security profile..."
-        docker-compose --profile security up -d falco
+        docker compose -f "$PROJECT_ROOT/infra/docker/docker-compose.yml" --profile security up -d falco
         sleep 10
     fi
     

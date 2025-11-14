@@ -1,0 +1,235 @@
+# ==================================================================================================
+# DATADOG AGENT HELM VALUES - For Argo CD Deployment
+# ==================================================================================================
+# Purpose: Helm values file for Datadog Agent deployment via Argo CD
+# Chart: datadog/datadog (official Datadog Helm chart)
+# Documentation: https://docs.datadoghq.com/containers/kubernetes/installation/
+# ==================================================================================================
+
+datadog:
+  # API Key Configuration
+  # Store API key in Kubernetes Secret named 'datadog-secret' with key 'api-key'
+  # Create secret: kubectl create secret generic datadog-secret --from-literal api-key=<YOUR_API_KEY> -n monitoring
+  apiKeyExistingSecret: datadog-secret
+  apiKeyExistingSecretKey: api-key
+  
+  # Datadog Site Configuration
+  site: us5.datadoghq.com
+  
+  # Cluster Configuration
+  clusterName: ecommerce-k8s
+  
+  # Tags applied to all metrics, logs, and traces
+  tags:
+    - "env:production"
+    - "service:ecommerce"
+    - "team:sre"
+    - "cluster:ecommerce-k8s"
+  
+  # ===== LOG COLLECTION =====
+  logs:
+    enabled: true
+    containerCollectAll: true
+    logsConfig:
+      containerCollectAll: true
+      containerInclude:
+        - "name:ecommerce-*"
+      containerExclude:
+        - "name:datadog-agent"
+  
+  # ===== APM (Application Performance Monitoring) =====
+  apm:
+    enabled: true
+    portEnabled: true
+    port: 8126
+    useSocketVolume:
+      enabled: false
+    socketPath: /var/run/datadog/apm.socket
+    nonLocalTraffic: true
+    env: production
+    service: ecommerce-app
+  
+  # ===== PROCESS AGENT =====
+  processAgent:
+    enabled: false
+    processCollection: false
+  
+  # ===== SYSTEM PROBE (Network Monitoring) =====
+  systemProbe:
+    enabled: true
+    enableTCPQueueLength: true
+    enableOOMKill: true
+    enableConntrack: true
+  
+  networkMonitoring:
+    enabled: true
+  
+  # ===== SECURITY AGENT =====
+  securityAgent:
+    enabled: true
+    runtime:
+      enabled: true
+  
+  # ===== RUNTIME METRICS =====
+  runtimeMetrics:
+    enabled: true
+  
+  # ===== KUBERNETES INTEGRATION =====
+  collectEvents: true
+  collectKubernetesMetrics: true
+  collectMetadataTags: true
+  metadataTagUpdateFreq: 60
+  
+  # cAdvisor metrics collection
+  cAdvisorMetricsEnabled: true
+  cAdvisorMetricsPort: 4194
+  
+  # Orchestrator Explorer - collects Kubernetes resource data
+  orchestratorExplorer:
+    enabled: true
+    clusterName: ecommerce-k8s
+    collectKubernetesResources: true
+  
+  orchestrator:
+    enabled: true
+    collectResourceTags: true
+  
+  # Kubelet configuration
+  kubelet:
+    host:
+      valueFrom:
+        fieldRef:
+          fieldPath: status.hostIP
+    tlsVerify: false
+    hostCAPath: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
+  
+  # Leader election for high availability
+  leaderElection: true
+  leaderLeaseDuration: 60
+  
+  # ===== RESOURCE LIMITS =====
+  resources:
+    requests:
+      memory: "512Mi"
+      cpu: "200m"
+    limits:
+      memory: "1Gi"
+      cpu: "1000m"
+  
+  # ===== VOLUME MOUNTS =====
+  volumeMounts:
+    - name: dockersocket
+      mountPath: /var/run/docker.sock
+    - name: procdir
+      mountPath: /host/proc
+      readOnly: true
+    - name: cgroups
+      mountPath: /host/sys/fs/cgroup
+      readOnly: true
+  
+  volumes:
+    - name: dockersocket
+      hostPath:
+        path: /var/run/docker.sock
+    - name: procdir
+      hostPath:
+        path: /proc
+    - name: cgroups
+      hostPath:
+        path: /sys/fs/cgroup
+
+# ===== CLUSTER AGENT CONFIGURATION =====
+clusterAgent:
+  enabled: true
+  
+  # Cluster Agent resources
+  resources:
+    requests:
+      memory: "128Mi"
+      cpu: "100m"
+    limits:
+      memory: "256Mi"
+      cpu: "200m"
+  
+  # Environment variables
+  env:
+    - name: DD_COLLECT_KUBERNETES_STATE_METRICS
+      value: "true"
+    - name: DD_ORCHESTRATOR_EXPLORER_ENABLED
+      value: "true"
+    - name: DD_ORCHESTRATOR_CLUSTER_NAME
+      value: "ecommerce-k8s"
+    - name: DD_CLUSTER_AGENT_KUBERNETES_METRICS_ENABLED
+      value: "true"
+    - name: DD_CLUSTER_AGENT_METRICS_PROVIDER_ENABLED
+      value: "true"
+  
+  # Health checks
+  healthPort: 5555
+  livenessProbe:
+    httpGet:
+      path: /health
+      port: 5555
+    initialDelaySeconds: 15
+    periodSeconds: 15
+    timeoutSeconds: 5
+    failureThreshold: 3
+  readinessProbe:
+    httpGet:
+      path: /ready
+      port: 5555
+    initialDelaySeconds: 5
+    periodSeconds: 5
+    timeoutSeconds: 3
+    failureThreshold: 3
+
+# ===== ADDITIONAL AGENT CONFIGURATION =====
+agents:
+  # DaemonSet configuration
+  useHostNetwork: false
+  useConfigMap: true
+  
+  # Tolerations for scheduling on all nodes
+  tolerations:
+    - effect: NoSchedule
+      operator: Exists
+    - effect: NoExecute
+      operator: Exists
+  
+  # Node selector
+  nodeSelector: {}
+  
+  # Additional volumes (mounted by agents)
+  volumes:
+    - name: dockersocket
+      hostPath:
+        path: /var/run/docker.sock
+    - name: procdir
+      hostPath:
+        path: /proc
+    - name: cgroups
+      hostPath:
+        path: /sys/fs/cgroup
+    - name: sysprobe-socket-dir
+      hostPath:
+        path: /var/run/sysprobe
+  
+  # Additional volume mounts
+  volumeMounts:
+    - name: dockersocket
+      mountPath: /var/run/docker.sock
+    - name: procdir
+      mountPath: /host/proc
+      readOnly: true
+    - name: cgroups
+      mountPath: /host/sys/fs/cgroup
+      readOnly: true
+    - name: sysprobe-socket-dir
+      mountPath: /var/run/sysprobe
+
+# ===== KUBERNETES STATE METRICS =====
+kubeStateMetricsEnabled: true
+
+# ===== DATADOG METRICS SERVER =====
+datadogMetricsServer:
+  enabled: false  # Enable if using External Metrics for HPA

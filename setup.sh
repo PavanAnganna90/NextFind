@@ -80,15 +80,15 @@ install_dependencies() {
     
     # Install client dependencies
     print_status "Installing client dependencies..."
-    cd client
+    cd apps/client
     pnpm install
-    cd ..
+    cd ../../
     
     # Install admin dependencies
     print_status "Installing admin dependencies..."
-    cd admin
+    cd apps/admin
     pnpm install
-    cd ..
+    cd ../../
     
     print_success "Dependencies installed successfully"
 }
@@ -98,19 +98,19 @@ setup_environment() {
     print_status "Setting up environment files..."
     
     # Client environment
-    if [ ! -f "client/.env.local" ]; then
-        cp client/.env.example client/.env.local
-        print_success "Created client/.env.local"
+    if [ ! -f "apps/client/.env.local" ]; then
+        cp apps/client/.env.example apps/client/.env.local
+        print_success "Created apps/client/.env.local"
     else
-        print_warning "client/.env.local already exists"
+        print_warning "apps/client/.env.local already exists"
     fi
     
     # Admin environment
-    if [ ! -f "admin/.env.local" ]; then
-        cp admin/.env.example admin/.env.local
-        print_success "Created admin/.env.local"
+    if [ ! -f "apps/admin/.env.local" ]; then
+        cp apps/admin/.env.example apps/admin/.env.local
+        print_success "Created apps/admin/.env.local"
     else
-        print_warning "admin/.env.local already exists"
+        print_warning "apps/admin/.env.local already exists"
     fi
 }
 
@@ -122,15 +122,15 @@ generate_secrets() {
     NEXTAUTH_SECRET=$(openssl rand -base64 32)
     
     # Update client .env.local
-    if [ -f "client/.env.local" ]; then
-        sed -i.bak "s/your_nextauth_secret_here_minimum_32_characters/$NEXTAUTH_SECRET/g" client/.env.local
-        rm client/.env.local.bak
+    if [ -f "apps/client/.env.local" ]; then
+        sed -i.bak "s/your_nextauth_secret_here_minimum_32_characters/$NEXTAUTH_SECRET/g" apps/client/.env.local
+        rm apps/client/.env.local.bak
     fi
     
     # Update admin .env.local
-    if [ -f "admin/.env.local" ]; then
-        sed -i.bak "s/your_nextauth_secret_here_minimum_32_characters/$NEXTAUTH_SECRET/g" admin/.env.local
-        rm admin/.env.local.bak
+    if [ -f "apps/admin/.env.local" ]; then
+        sed -i.bak "s/your_nextauth_secret_here_minimum_32_characters/$NEXTAUTH_SECRET/g" apps/admin/.env.local
+        rm apps/admin/.env.local.bak
     fi
     
     print_success "Generated NextAuth secret"
@@ -182,10 +182,10 @@ main() {
     print_success "Setup completed successfully!"
     echo ""
     echo "📝 Next steps:"
-    echo "1. Edit client/.env.local and admin/.env.local with your configuration"
+    echo "1. Edit apps/client/.env.local and apps/admin/.env.local with your configuration"
     echo "2. Set up your database and Redis if not already running"
     echo "3. Configure your Stripe keys for payment processing"
-    echo "4. Run 'pnpm dev' in both client and admin directories"
+    echo "4. Run 'pnpm dev' in both apps/client and apps/admin directories"
     echo ""
     echo "📚 See SETUP.md for detailed configuration instructions"
     echo ""

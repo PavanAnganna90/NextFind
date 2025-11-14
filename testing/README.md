@@ -359,14 +359,14 @@ test.describe('Shopping Flow', () => {
 test.describe('Admin Product Management', () => {
   test('should create and manage products', async ({ page }) => {
     // Login as admin
-    await page.goto('/admin/login');
+    await page.goto('/apps/admin/login');
     await page.fill('[data-testid="email"]', 'admin@example.com');
     await page.fill('[data-testid="password"]', 'admin123');
     await page.click('[data-testid="login-button"]');
     
     // Navigate to products
     await page.click('[data-testid="products-menu"]');
-    await expect(page).toHaveURL('/admin/products');
+    await expect(page).toHaveURL('/apps/admin/products');
     
     // Create new product
     await page.click('[data-testid="add-product"]');

@@ -31,30 +31,30 @@ jobs:
           echo "🔍 Validating Docker build requirements..."
 
           # Check if required files exist
-          if [ ! -f "client/package.json" ]; then
-              echo "❌ ERROR: client/package.json not found"
+          if [ ! -f "apps/client/package.json" ]; then
+              echo "❌ ERROR: apps/client/package.json not found"
               exit 1
           fi
 
-          if [ ! -f "client/pnpm-lock.yaml" ]; then
-              echo "❌ ERROR: client/pnpm-lock.yaml not found"
+          if [ ! -f "apps/client/pnpm-lock.yaml" ]; then
+              echo "❌ ERROR: apps/client/pnpm-lock.yaml not found"
               exit 1
           fi
 
-          if [ ! -f "client/start.sh" ]; then
-              echo "❌ ERROR: client/start.sh not found"
+          if [ ! -f "apps/client/start.sh" ]; then
+              echo "❌ ERROR: apps/client/start.sh not found"
               exit 1
           fi
 
-          if [ ! -f "client/Dockerfile" ]; then
-              echo "❌ ERROR: client/Dockerfile not found"
+          if [ ! -f "apps/client/Dockerfile" ]; then
+              echo "❌ ERROR: apps/client/Dockerfile not found"
               exit 1
           fi
 
           echo "✅ All Docker build requirements validated"
 
           # Check package manager consistency
-          PACKAGE_MANAGER=$(grep -o '"packageManager": "[^"]*"' client/package.json | cut -d'"' -f4)
+          PACKAGE_MANAGER=$(grep -o '"packageManager": "[^"]*"' apps/client/package.json | cut -d'"' -f4)
           if [[ "$PACKAGE_MANAGER" == "pnpm"* ]]; then
               echo "✅ Package manager: $PACKAGE_MANAGER (consistent with pnpm-lock.yaml)"
           else
@@ -193,7 +193,7 @@ jobs:
       - name: Run pre-deployment validation
         run: |
           echo "🔍 Running comprehensive pre-deployment checks..."
-          cd k8s-manifests/scripts
+          cd infra/kubernetes/scripts
           chmod +x pre-deploy-check.sh
           ./pre-deploy-check.sh
 
@@ -253,14 +253,14 @@ jobs:
           kubectl create namespace ${{ env.KUBERNETES_NAMESPACE }} --dry-run=client -o yaml | kubectl apply -f -
 
           # Deploy application
-          cd k8s-manifests/scripts
+          cd infra/kubernetes/scripts
           chmod +x deploy.sh
           ./deploy.sh ${{ env.KUBERNETES_NAMESPACE }}
 
       - name: Deploy Monitoring Stack
         run: |
           # Deploy monitoring stack (includes DataDog, Prometheus, Grafana, Jaeger, AlertManager)
-          cd k8s-manifests/monitoring
+          cd infra/kubernetes/monitoring
           chmod +x deploy-monitoring.sh
 
           # Export DATADOG_API_KEY if available (optional)

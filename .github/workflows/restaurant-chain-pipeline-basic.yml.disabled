@@ -40,13 +40,13 @@ jobs:
         with:
           filters: |
             client:
-              - 'client/**'
+              - 'apps/client/**'
               - 'package.json'
               - 'package-lock.json'
             admin:
-              - 'admin/**'
-              - 'admin/package.json'
-              - 'admin/package-lock.json'
+              - 'apps/admin/**'
+              - 'apps/admin/package.json'
+              - 'apps/admin/package-lock.json'
 
       - name: 🍳 Setup Kitchen Tools
         uses: actions/setup-node@v4
@@ -61,9 +61,9 @@ jobs:
           path: |
             ~/.npm
             node_modules
-            client/node_modules
-            admin/node_modules
-          key: ${{ runner.os }}-npm-${{ hashFiles('package-lock.json', 'admin/package-lock.json') }}
+            apps/client/node_modules
+            apps/admin/node_modules
+          key: ${{ runner.os }}-npm-${{ hashFiles('package-lock.json', 'apps/admin/package-lock.json') }}
           restore-keys: |
             ${{ runner.os }}-npm-
 
@@ -121,9 +121,9 @@ jobs:
           path: |
             ~/.npm
             node_modules
-            client/node_modules
-            admin/node_modules
-          key: ${{ runner.os }}-npm-${{ hashFiles('package-lock.json', 'admin/package-lock.json') }}
+            apps/client/node_modules
+            apps/admin/node_modules
+          key: ${{ runner.os }}-npm-${{ hashFiles('package-lock.json', 'apps/admin/package-lock.json') }}
           restore-keys: |
             ${{ runner.os }}-npm-
 
@@ -131,11 +131,11 @@ jobs:
         uses: actions/cache@v4
         with:
           path: |
-            client/.next/cache
+            apps/client/.next/cache
             node_modules/.cache
-          key: ${{ runner.os }}-nextjs-${{ hashFiles('package-lock.json', 'admin/package-lock.json') }}-${{ hashFiles('client/**/*.tsx', 'client/**/*.ts', 'client/**/*.js', 'client/**/*.jsx') }}
+          key: ${{ runner.os }}-nextjs-${{ hashFiles('package-lock.json', 'apps/admin/package-lock.json') }}-${{ hashFiles('apps/client/**/*.tsx', 'apps/client/**/*.ts', 'apps/client/**/*.js', 'apps/client/**/*.jsx') }}
           restore-keys: |
-            ${{ runner.os }}-nextjs-${{ hashFiles('package-lock.json', 'admin/package-lock.json') }}-
+            ${{ runner.os }}-nextjs-${{ hashFiles('package-lock.json', 'apps/admin/package-lock.json') }}-
             ${{ runner.os }}-nextjs-
 
       - name: 🏗️ Build Recipe
@@ -164,9 +164,9 @@ jobs:
         uses: actions/cache@v4
         with:
           path: |
-            client/.next/cache
+            apps/client/.next/cache
             node_modules/.cache
-          key: ${{ runner.os }}-nextjs-${{ hashFiles('package-lock.json', 'admin/package-lock.json') }}-${{ hashFiles('client/**/*.tsx', 'client/**/*.ts', 'client/**/*.js', 'client/**/*.jsx') }}
+          key: ${{ runner.os }}-nextjs-${{ hashFiles('package-lock.json', 'apps/admin/package-lock.json') }}-${{ hashFiles('apps/client/**/*.tsx', 'apps/client/**/*.ts', 'apps/client/**/*.js', 'apps/client/**/*.jsx') }}
 
       - name: 📦 Package in Container
         run: |

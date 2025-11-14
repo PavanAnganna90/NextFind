@@ -69,7 +69,7 @@ print_status "Namespaces created"
 
 # Deploy application stack
 echo -e "${BLUE}🚀 Deploying application stack...${NC}"
-cd k8s-manifests/scripts
+cd infra/kubernetes/scripts
 chmod +x deploy.sh
 ./deploy.sh ${NAMESPACE}
 cd ../..
@@ -77,7 +77,7 @@ print_status "Application stack deployed"
 
 # Deploy monitoring stack
 echo -e "${BLUE}📊 Deploying monitoring stack...${NC}"
-cd k8s-manifests/monitoring
+cd infra/kubernetes/monitoring
 
 # Deploy DataDog
 if [ ! -z "$DATADOG_API_KEY" ]; then
