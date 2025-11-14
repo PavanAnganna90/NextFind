@@ -190,6 +190,7 @@ storybook-static/
 .cache
 *.tmp
 *.bak
+internal-notes/
 
 # Backup files
 *.backup
