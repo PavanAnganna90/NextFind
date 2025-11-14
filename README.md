@@ -25,25 +25,30 @@ NextFind is an end-to-end commerce platform with a customer storefront, an analy
 ## 🗂 Repository Layout
 ```
 apps/
-  apps/client/            # Storefront Next.js app
-  apps/admin/             # Admin dashboard Next.js app
+  admin/                     # Admin dashboard Next.js app
+  client/                    # Storefront Next.js app
 services/
-  api/               # Backend utilities and scripts
+  api/
+    scripts/maintenance/     # Product/data fix utilities
+    sql/                     # Seed + migration helpers
 infra/
-  docker/            # docker-compose and Dockerfiles
-  kubernetes/        # Production-ready manifests & overlays
-  monitoring/        # Datadog, Prometheus, Grafana configs
+  docker/                    # docker-compose stacks
+  kubernetes/
+    base/, overlays/, hotfixes/
+  monitoring/                # Datadog + Prometheus assets
 docs/
-  architecture.md    # High-level system diagram and flows
-  operations.md      # Deploy/runbooks
-  troubleshooting.md # Known issues & fixes
+  architecture.md
+  operations.md
+  troubleshooting.md
+testing/
+  scripts/                   # Manual verification helpers
 .github/
-  workflows/ci.yml   # Lint + test pipeline
-  ISSUE_TEMPLATE/    # Bug & feature templates
-README.md
+  workflows/ci.yml
+  ISSUE_TEMPLATE/
 CHANGELOG.md
 CONTRIBUTING.md
 LICENSE
+README.md
 ```
 
 ---
